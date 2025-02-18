@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from googletrans import Translator
 import csv
+import sys
+import os
 
 # Simple functions 
 def extract_text_from_pdf(pdf_path):
@@ -67,6 +69,8 @@ def write_csv_line(file, writer, elements):
 class ChinesePhrase:
     CACHE = {}
     SUB_PHRASE_LIMIT = 10
+    SKIP_SEGMENTATION = False
+    SKIP_TRANSLATION = False
     
     def __init__(self, text, pinyin, translation=None, sub_phrases=None):
         self.text = text
@@ -83,7 +87,7 @@ class ChinesePhrase:
             return ChinesePhrase.CACHE[text]
 
         pinyin_text = generate_pinyin(text)
-        translation = await translateAsync(text, 'da')
+        translation = await translateAsync(text, 'da') if not ChinesePhrase.SKIP_TRANSLATION else ''
         
         instance =  ChinesePhrase(text, pinyin_text, translation)
         ChinesePhrase.CACHE[text] = instance
@@ -97,6 +101,9 @@ class ChinesePhrase:
         if len(phrase) > ChinesePhrase.SUB_PHRASE_LIMIT: 
             return await ChinesePhrase.create_async(phrase)
         
+        if ChinesePhrase.SKIP_SEGMENTATION:
+            return await ChinesePhrase.create_async(phrase)
+
         instance = await ChinesePhrase.create_async(phrase)
         
         instance.sub_phrases = []
@@ -106,9 +113,9 @@ class ChinesePhrase:
 
         return instance
 
-async def main_async():
-    pdf_path = 'slides\\1 - kinas sprog.pdf'
-    csv_path = 'slides\\1 - kinas sprog.csv'
+async def process_file_async(pdf_path):
+    print("\nProcessing file: ", pdf_path)
+    csv_path = pdf_path.replace('.pdf', '.csv')
 
     pdf_text = extract_text_from_pdf(pdf_path)
     chinese_text = filter_chinese_characters(pdf_text)
@@ -123,7 +130,38 @@ async def main_async():
             
             for sub_phrase in chinese_phrase.sub_phrases:
                 write_csv_line(file, writer, [sub_phrase.text, sub_phrase.pinyin, sub_phrase.translation, chinese_phrase.text])
-                
+
+async def main_async(path): 
+    if os.path.isdir(path):
+        pdf_files = [f for f in os.listdir(path) if f.endswith('.pdf')]
+        if not pdf_files:
+            print('No PDF files found in the directory')
+            sys.exit(1)
+        for pdf_file in pdf_files:
+            await process_file_async(os.path.join(path, pdf_file))
+    else:
+        if not os.path.isfile(path):
+            print('The provided path is not a valid file or directory')
+            sys.exit(1)
+        await process_file_async(path)
+
 if __name__ == "__main__":
-    asyncio.run(main_async())
+    # Get pdf/directory path from arguments 
+    path = None 
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    else: 
+        print('Please provide a path to a PDF file')
+        sys.exit(1)
+
+    # Check for optional arguments
+    if '--skip-translation' in sys.argv or '--skip-all' in sys.argv:
+        print("Skipping translation")
+        ChinesePhrase.SKIP_TRANSLATION = True
+        
+    if '--skip-segmentation' in sys.argv or '--skip-all' in sys.argv:
+        print("Skipping segmentation")
+        ChinesePhrase.SKIP_SEGMENTATION = True
+        
+    asyncio.run(main_async(path))
     
