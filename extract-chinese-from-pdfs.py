@@ -1,0 +1,129 @@
+import asyncio
+from pypdf import PdfReader
+import re
+import pinyin
+import requests
+from bs4 import BeautifulSoup
+from googletrans import Translator
+import csv
+
+# Simple functions 
+def extract_text_from_pdf(pdf_path):
+    pdf_reader = PdfReader(pdf_path)
+    return ' '.join(page.extract_text() for page in pdf_reader.pages)
+
+def filter_chinese_characters(text):
+    chinese_signs = re.findall(r'[\u4e00-\u9fff]+', text)
+    return ' '.join(chinese_signs)
+
+def generate_pinyin(text):
+    return pinyin.get(text, delimiter=' ')
+
+def has_wiktionary_entry(chinese_phrase):
+    url = f'https://en.wiktionary.org/wiki/{chinese_phrase}'
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        chinese_section = soup.find('h2', id='Chinese')
+        return chinese_section is not None
+    else:
+        return False
+    
+def extract_combinations(text):
+    combinations = set()
+    length = len(text)
+    
+    for i in range(length):
+        for j in range(i + 1, length + 1):
+            combinations.add(text[i:j])
+
+    combinations.remove(text)
+    
+    sorted_combinations = sorted(combinations, key=lambda x: (len(x), text.index(x)))
+
+    return list(sorted_combinations)
+
+def extract_chinese_sub_phrases(chinese_phrase):
+    potential_sub_phrases = extract_combinations(chinese_phrase)
+
+    valid_sub_phrases = []
+    for sub_phrase in potential_sub_phrases:
+        if has_wiktionary_entry(sub_phrase):
+            valid_sub_phrases.append(sub_phrase)
+
+    return valid_sub_phrases
+
+async def translateAsync(text, target_language):
+    translator = Translator()
+    translation = await translator.translate(text, dest=target_language)
+    return translation.text
+
+def write_csv_line(file, writer, elements):
+    print('\t\t\t'.join(elements))
+    writer.writerow(elements)
+    file.flush()
+
+class ChinesePhrase:
+    CACHE = {}
+    SUB_PHRASE_LIMIT = 10
+    
+    def __init__(self, text, pinyin, translation=None, sub_phrases=None):
+        self.text = text
+        self.pinyin = pinyin
+        self.translation = translation
+        self.sub_phrases = sub_phrases or []
+
+    def __str__(self):
+        return f'{self.text} ({self.pinyin})'
+
+    @staticmethod
+    async def create_async(text):
+        if text in ChinesePhrase.CACHE:
+            return ChinesePhrase.CACHE[text]
+
+        pinyin_text = generate_pinyin(text)
+        translation = await translateAsync(text, 'da')
+        
+        instance =  ChinesePhrase(text, pinyin_text, translation)
+        ChinesePhrase.CACHE[text] = instance
+        return instance
+    
+    @staticmethod
+    async def create_with_sub_phrases_async(phrase):
+        if phrase in ChinesePhrase.CACHE:
+            return ChinesePhrase.CACHE[phrase]
+
+        if len(phrase) > ChinesePhrase.SUB_PHRASE_LIMIT: 
+            return await ChinesePhrase.create_async(phrase)
+        
+        instance = await ChinesePhrase.create_async(phrase)
+        
+        instance.sub_phrases = []
+        for sub_phrase in extract_chinese_sub_phrases(phrase):
+            sub_instance = await ChinesePhrase.create_async(sub_phrase)
+            instance.sub_phrases.append(sub_instance)
+
+        return instance
+
+async def main_async():
+    pdf_path = 'slides\\1 - kinas sprog.pdf'
+    csv_path = 'slides\\1 - kinas sprog.csv'
+
+    pdf_text = extract_text_from_pdf(pdf_path)
+    chinese_text = filter_chinese_characters(pdf_text)
+
+    with open(csv_path, mode='w', newline='\n', encoding='utf-8-sig') as file:
+        writer = csv.writer(file, delimiter=';')
+        write_csv_line(file, writer, ['Text', 'Pinyin', 'Translation', 'Sub Phrase Of'])
+                       
+        for part in chinese_text.split():
+            chinese_phrase = await ChinesePhrase.create_with_sub_phrases_async(part)
+            write_csv_line(file, writer, [chinese_phrase.text, chinese_phrase.pinyin, chinese_phrase.translation, ''])
+            
+            for sub_phrase in chinese_phrase.sub_phrases:
+                write_csv_line(file, writer, [sub_phrase.text, sub_phrase.pinyin, sub_phrase.translation, chinese_phrase.text])
+                
+if __name__ == "__main__":
+    asyncio.run(main_async())
+    

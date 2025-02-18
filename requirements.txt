@@ -1,0 +1,6 @@
+asyncio
+pypdf
+pinyin
+requests
+beautifulsoup4
+googletrans
