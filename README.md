@@ -1,4 +1,19 @@
-# Chinese Text Extraction from PDFs
+# Chinese-Danish flashcards generator from PDFs 
+Simplify learning by extracting flashcards from your Chinese course slides (PDF-format-only).
+
+The flashcards are generated in 3-steps: 
+1. Extract chinese phrases from PDFs
+    A. Extracts Chinese text from PDFs
+    B. Expand on the Chinese text by segmenting it into meaningful subphrases (Optional). Meaningfulness is determined by the existence of a corrosponding english Wiktionary page.
+    C. Generate pin yin for each phrase
+    D. Generate Danish translations for each phrase (Optional)
+    E. Output the extracted phrases to a CSV file
+2. Generate flashcards from extracted phrases
+    A. Generate flashcards for each phrase
+    B. Output the flashcards to a TXT file
+3. Import the flashcards to your favorite flashcard webpage (e.g. Quizlet)
+    A. Create new flashcard set
+    B. Import the flashcards from the TXT file
 
 ## Setup 
 1. Install required python packages by running the following command in your terminal: 
