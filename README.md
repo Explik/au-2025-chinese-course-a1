@@ -31,7 +31,7 @@ py extract-chinese-from-pdfs.py < path_to_pdf_or_directory >
 
 Ex. 
 ```bash
-py extract-chinese-from-pdfs.py ./slides/1-kinas-sprog.pdf```
+py extract-chinese-from-pdfs.py ./slides/example.pdf --skip-all
 ```
 
 Flags: 
