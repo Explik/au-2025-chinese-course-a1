@@ -23,3 +23,12 @@ Flags:
 - ```--skip-translation```: Skip translation of extracted Chinese text to Danish.
 - ```--skip-segmentation```: Skip extraction of (sub)phrases from the Chinese text.
 - ```--skip-all```: Skip both translation and segmentation of the extracted Chinese text.
+
+To generate flashcards from (generated) CSVs, run the following command in your terminal: 
+```bash
+py generate-flashcards-from-csvs.py < path_to_csv_or_directory >
+```
+
+Flags: 
+- ```--one-way```: Generate one-way flashcards (i.e. only from Chinese to Danish). Default is two-way flashcards (i.e. from Chinese to Danish and vice versa).
+- ```--skip-segmented```: Skip all (sub)phrase flashcards. Default is to generate flashcards for all.
