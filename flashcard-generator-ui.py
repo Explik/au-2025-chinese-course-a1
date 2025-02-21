@@ -190,15 +190,17 @@ pdf_file_path = get_pdf_path()
 csv_file_path = get_csv_path()
 txt_file_path = get_txt_path()
 
-print("=====================================")
-print(f"Mode: {mode}")
-print(f"PDF: {pdf_file_path}")
-print(f"CSV: {csv_file_path}")
-print(f"TXT: {txt_file_path}")
-print(f"Session State: {session_state}")
+# Debugging
+#print("=====================================")
+#print(f"Mode: {mode}")
+#print(f"PDF: {pdf_file_path}")
+#print(f"CSV: {csv_file_path}")
+#print(f"TXT: {txt_file_path}")
+#print(f"Session State: {session_state}")
 
 # Upload section 
 st.title("CH-DA Flashcard Generator")
+st.write("Upload a PDF or an already generated CSV file to generate flashcards.")
 
 file_upload = st.file_uploader(
     "Choose CSV/PDF file", 
@@ -210,7 +212,7 @@ file_upload = st.file_uploader(
 # Generate CSV section
 if mode == "pdf":
     st.header("1. Generate CSV file")
-    st.write(f"Generate CSV file from PDF \"{pdf_file_path}\"")
+    st.write(f"Generate CSV file from PDF (with location \"{pdf_file_path}\")")
 
     skip_translation = st.checkbox("Skip translation", key="skip_translation", value=False)
     skip_segmentation = st.checkbox("Skip segmentation", key="skip_segmentation", value=False)
@@ -237,8 +239,19 @@ if csv_file_path is not None:
     if mode == "csv":
         st.header("Generate Flashcards")
 
-    st.write(f"Generate flashcards from CSV {csv_file_path}...")
-    st.text_area("Flashcared Template", value="{text}\\t{translation}", key="translation_template")
+    st.text(f"Generate flashcards from CSV (with location \"{csv_file_path}\").")
+    st.text(""\
+            "The following template will be used to generate flashcards pr. row in the CSV." \
+            "The template allows for the following placeholders and special characters:\n" \
+            "- {text} - The Chinese text\n" \
+            "- {pinyin} - The Pinyin pronunciation\n" \
+            "- {translation} - The translation\n" \
+            "- \\t - Tab character\n" \
+            "- \\n - New line character\n" \
+            "".strip())
+    
+    st.text_area("Flashcared Template", value="{text} ({pinyin})\\t{translation}", key="translation_template")
+
     st.checkbox("Skip segmented", value=False, key="skip_segmented")
     st.button("Generate Flashcards", on_click=handle_csv_convert)
 
