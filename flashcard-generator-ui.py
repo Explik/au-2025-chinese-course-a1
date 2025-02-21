@@ -19,6 +19,18 @@ def save_uploaded_file(file_name: str, buffer):
 
     return file_path
 
+def reveal_file_in_explorer(file_path: str):
+    try:
+        if os.name == 'nt':  # Windows
+            os.startfile(file_path)
+        elif os.name == 'posix':  # macOS or Linux
+            if sys.platform == 'darwin':  # macOS
+                subprocess.call(['open', '-R', file_path])
+            else:  # Linux
+                subprocess.call(['xdg-open', file_path])
+    except Exception as e:
+        st.error(f"An error occurred while trying to reveal the file: {e}")
+
 def get_mode(): 
     if session_state.get("mode", None) is not None: 
         return session_state.mode
@@ -69,10 +81,8 @@ def handle_file_upload():
         return 
 
     try: 
-        print(f"File uploaded 2: {file_upload.name}")
         file_name = file_upload.name
         uploaded_file_path = save_uploaded_file(file_name, file_upload.getbuffer())
-        print("Hel")
 
         if (file_name.endswith(".pdf")):
             session_state.mode = "pdf"
@@ -82,6 +92,7 @@ def handle_file_upload():
             return
         if (file_name.endswith(".csv")):
             session_state.mode = "csv"
+            session_state.pdf_file_path = None
             session_state.csv_process = {
                 "status": "completed",
                 "result": uploaded_file_path
@@ -207,6 +218,17 @@ if mode == "pdf":
     st.button(
         "Convert", 
         on_click=handle_pdf_convert)
+    
+    if csv_file_path is not None: 
+        col1, col2 = st.columns([6, 2])
+        with col1:
+            st.success(f"CSV file generated: {csv_file_path}")
+        with col2:
+            st.button(
+                "Open file",
+                key="open_csv_file",
+                use_container_width=True,
+                on_click=lambda: reveal_file_in_explorer(csv_file_path))
 
 # Generate Flashcards section
 if csv_file_path is not None:
@@ -217,12 +239,23 @@ if csv_file_path is not None:
 
     st.write(f"Generate flashcards from CSV {csv_file_path}...")
     st.text_area("Flashcared Template", value="{text}\\t{translation}", key="translation_template")
-    st.checkbox("Skip segmented", value=False)
+    st.checkbox("Skip segmented", value=False, key="skip_segmented")
     st.button("Generate Flashcards", on_click=handle_csv_convert)
+
+    if txt_file_path is not None:
+        col1, col2 = st.columns([6, 2])
+        with col1:
+            st.success(f"Flashcards generated: {txt_file_path}")
+        with col2:
+            st.button(
+                "Open file", 
+                key="open_flashcard_file",
+                use_container_width=True,
+                on_click=lambda: reveal_file_in_explorer(txt_file_path))
 
 if txt_file_path is not None:
     txt_content = get_txt_content()
 
-    st.empty()
+    st.write("#####")
     st.text_area("Generated Flashcards", txt_content, height=300)
     st.button("Copy to Clipboard", on_click=handle_txt_copy)
