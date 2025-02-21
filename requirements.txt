@@ -4,3 +4,5 @@ pinyin
 requests
 beautifulsoup4
 googletrans
+streamlit
+pyperclip

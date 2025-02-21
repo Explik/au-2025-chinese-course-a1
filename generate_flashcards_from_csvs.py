@@ -73,6 +73,8 @@ def process_file(csv_path):
     with open(txt_path, mode='w', newline='\n', encoding='utf-8') as txt_file:
             txt_file.writelines(flashcards)
 
+    return txt_path
+
 def main(path): 
     if os.path.isdir(path):
         csv_files = [f for f in os.listdir(path) if f.endswith('.csv')]

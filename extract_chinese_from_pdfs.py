@@ -131,6 +131,8 @@ async def process_file_async(pdf_path):
             for sub_phrase in chinese_phrase.sub_phrases:
                 write_csv_line(file, writer, [sub_phrase.text, sub_phrase.pinyin, sub_phrase.translation, chinese_phrase.text])
 
+    return csv_path
+
 async def main_async(path): 
     if os.path.isdir(path):
         pdf_files = [f for f in os.listdir(path) if f.endswith('.pdf')]
