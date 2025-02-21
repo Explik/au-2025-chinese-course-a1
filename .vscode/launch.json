@@ -15,7 +15,7 @@
             "name": "Extract chinese from slides folder",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/extract-chinese-from-pdfs.py",
+            "program": "${workspaceFolder}/extract_chinese_from_pdfs.py",
             "console": "integratedTerminal",
             "args": [
                 "./slides/",
@@ -26,7 +26,7 @@
             "name": "Generate (short) flashcards for slides folder",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/generate-flashcards-from-csvs.py",
+            "program": "${workspaceFolder}/generate_flashcards_from_csvs.py",
             "console": "integratedTerminal",
             "args": [
                 "./slides/",
@@ -38,7 +38,7 @@
             "name": "Generate (long) flashcards for slides folder",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/generate-flashcards-from-csvs.py",
+            "program": "${workspaceFolder}/generate_flashcards_from_csvs.py",
             "console": "integratedTerminal",
             "args": [
                 "./slides/",

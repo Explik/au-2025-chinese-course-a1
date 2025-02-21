@@ -23,7 +23,16 @@ pip install -r requirements.txt
 
 2. Configure authentication for the Google Translate API by following the instructions in [the Google Cloud Translation API documentation](https://cloud.google.com/translate/docs/setup). Otherwise, add the ```--skip-translation``` flag to the command line arguments when running the script.
 
-## Usage 
+## Usage (GUI)
+To use the generator through a user interface, run the following command in your terminal: 
+```bash
+streamlit run generator_ui.py
+``` 
+
+If you want to debug the UI, you can run the script debug_generator_ui.py instead.
+
+
+## Usage (CLI)
 To extract Chinese text from a PDF, run the following command in your terminal: 
 ```bash
 py extract-chinese-from-pdfs.py < path_to_pdf_or_directory >
