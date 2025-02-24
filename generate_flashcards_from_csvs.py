@@ -60,10 +60,13 @@ def deduplicate(csv_lines):
 def process_file(csv_path, output_directory):
     print("\nProcessing file: ", csv_path)
 
-    lines = CsvLine.from_csv_file(csv_path)
+    try: 
+        lines = CsvLine.from_csv_file(csv_path)
+    except Exception as e:
+        raise Exception(f"An error occurred while reading the CSV file: {e}")
+    
     if not lines:
-        print('No lines found in the CSV file')
-        return
+        raise Exception('No lines found in the CSV file')
     
     filtered_lines = deduplicate(lines[1:])
     
