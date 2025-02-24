@@ -73,6 +73,9 @@ def process_file(csv_path, output_directory):
     txt_file_name = csv_file_name.replace('.csv', '.txt')
     txt_file_path = os.path.join(output_directory, txt_file_name)
     
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
     with open(txt_file_path, mode='w', newline='\n', encoding='utf-8') as txt_file:
             txt_file.writelines(flashcards)
 
