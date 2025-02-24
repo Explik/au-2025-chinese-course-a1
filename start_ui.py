@@ -220,7 +220,7 @@ if mode == "pdf":
     st.header("1. Generate CSV file")
     st.write(f"Generate CSV file from PDF (with location \"{pdf_file_path}\")")
 
-    skip_translation = st.checkbox("Skip translation", key="skip_translation", value=False)
+    skip_translation = st.checkbox("Skip translation", key="skip_translation", value=False, disabled=not is_local)
     skip_segmentation = st.checkbox("Skip segmentation", key="skip_segmentation", value=False)
 
     st.button(
@@ -232,11 +232,18 @@ if mode == "pdf":
         with col1:
             st.success(f"CSV file generated: {csv_file_path}")
         with col2:
-            st.button(
-                "Open file",
-                key="open_csv_file",
-                use_container_width=True,
-                on_click=lambda: reveal_file_in_explorer(csv_file_path))
+            if is_local: 
+                st.button(
+                    "Open file",
+                    key="open_csv_file",
+                    use_container_width=True,
+                    on_click=lambda: reveal_file_in_explorer(csv_file_path))
+            else: 
+                st.download_button(
+                    "Download file",
+                    csv_file_path,
+                    "flashcards.csv",
+                    key="download_csv_file")
 
 # Generate Flashcards section
 if csv_file_path is not None:
@@ -247,7 +254,7 @@ if csv_file_path is not None:
 
     st.text(f"Generate flashcards from CSV (with location \"{csv_file_path}\").")
     st.text(""\
-            "The following template will be used to generate flashcards pr. row in the CSV." \
+            "The following template will be used to generate flashcards pr. row in the CSV. " \
             "The template allows for the following placeholders and special characters:\n" \
             "- {text} - The Chinese text\n" \
             "- {pinyin} - The Pinyin pronunciation\n" \
@@ -266,11 +273,18 @@ if csv_file_path is not None:
         with col1:
             st.success(f"Flashcards generated: {txt_file_path}")
         with col2:
-            st.button(
-                "Open file", 
-                key="open_flashcard_file",
-                use_container_width=True,
-                on_click=lambda: reveal_file_in_explorer(txt_file_path))
+            if is_local:
+                st.button(
+                    "Open file", 
+                    key="open_flashcard_file",
+                    use_container_width=True,
+                    on_click=lambda: reveal_file_in_explorer(txt_file_path))
+            else: 
+                st.download_button(
+                    "Download file",
+                    txt_file_path,
+                    "flashcards.txt",
+                    key="download_flashcard_file")
 
 if txt_file_path is not None:
     txt_content = get_txt_content()
