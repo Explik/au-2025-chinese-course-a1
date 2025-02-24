@@ -55,5 +55,6 @@ py generate-flashcards-from-csvs.py < path_to_csv_or_directory >
 ```
 
 Flags: 
+- ```--output-directory [path]```: Specify the output directory for the generated TXTs. Default is the directory of the CSVs.
 - ```--one-way```: Generate one-way flashcards (i.e. only from Chinese to Danish). Default is two-way flashcards (i.e. from Chinese to Danish and vice versa).
 - ```--skip-segmented```: Skip all (sub)phrase flashcards. Default is to generate flashcards for all.

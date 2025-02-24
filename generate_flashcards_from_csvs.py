@@ -57,7 +57,7 @@ def deduplicate(csv_lines):
             deduplicated.append(line)
     return deduplicated
 
-def process_file(csv_path):
+def process_file(csv_path, output_directory):
     print("\nProcessing file: ", csv_path)
 
     lines = CsvLine.from_csv_file(csv_path)
@@ -69,36 +69,52 @@ def process_file(csv_path):
     
     flashcards = FlashcardGenerator.generate_flashcards(filtered_lines)
 
-    txt_path = csv_path.replace('.csv', '.txt')
-    with open(txt_path, mode='w', newline='\n', encoding='utf-8') as txt_file:
+    csv_file_name = os.path.basename(csv_path)
+    txt_file_name = csv_file_name.replace('.csv', '.txt')
+    txt_file_path = os.path.join(output_directory, txt_file_name)
+    
+    with open(txt_file_path, mode='w', newline='\n', encoding='utf-8') as txt_file:
             txt_file.writelines(flashcards)
 
-    return txt_path
+    return txt_file_path
 
-def main(path): 
+def main(path, output_directory): 
     if os.path.isdir(path):
         csv_files = [f for f in os.listdir(path) if f.endswith('.csv')]
         if not csv_files:
             print('No CSV files found in the directory')
             sys.exit(1)
         for csv_file in csv_files:
-            process_file(os.path.join(path, csv_file))
+            process_file(os.path.join(path, csv_file), output_directory)
     else:
         if not os.path.isfile(path):
             print('The provided path is not a valid file or directory')
             sys.exit(1)
-        process_file(path)
+        process_file(path, output_directory)
 
 if __name__ == "__main__":
     # Get csv/directory path from arguments 
-    path = None 
+    file_path = None 
     if len(sys.argv) > 1:
-        path = sys.argv[1]
+        file_path = sys.argv[1]
     else: 
         print('Please provide a path to a CSV file')
         sys.exit(1)
 
     # Check for optional arguments
+    output_directory = os.path.dirname(file_path)
+    if '--output-directory' in sys.argv:
+        output_index = sys.argv.index('--output-directory') + 1
+        if output_index < len(sys.argv):
+            output_directory = sys.argv[output_index]
+
+            if "--" in output_directory:
+                print('Please provide a valid output directory path')
+                sys.exit(1)
+        else:
+            print('Please provide a valid output directory path')
+            sys.exit(1)
+
     if '--one-way' in sys.argv:
         print("Using one-way flashcard template")
         FlashcardGenerator.TEMPLATE = first_direction_template
@@ -110,4 +126,4 @@ if __name__ == "__main__":
         print("Skipping segmented phrases")
         FlashcardGenerator.SKIP_SEGMENTED = True
         
-    main(path)
+    main(file_path, output_directory)

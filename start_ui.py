@@ -184,7 +184,7 @@ def handle_csv_convert():
         skip_segmented = session_state.get("skip_segmented", False)
         FlashcardGenerator.SKIP_SEGMENTED = skip_segmented
 
-        flashcard_file_path = process_file(csv_file_path)
+        flashcard_file_path = process_file(csv_file_path, "uploads-output")
 
         session_state.txt_process = {
             "status": "completed",
