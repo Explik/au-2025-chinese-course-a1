@@ -228,8 +228,8 @@ if mode == "pdf":
     st.header("1. Generate CSV file")
     st.write(f"Generate CSV file from PDF (with location \"{pdf_file_path}\")")
 
-    skip_translation = st.checkbox("Skip translation", key="skip_translation", value=False, disabled=not is_local)
-    skip_segmentation = st.checkbox("Skip segmentation", key="skip_segmentation", value=False)
+    skip_segmentation = st.checkbox("Skip segmentation", key="skip_segmentation", value=True)
+    skip_translation = st.checkbox("Skip translation", key="skip_translation", value=False)
 
     st.button(
         "Convert", 
