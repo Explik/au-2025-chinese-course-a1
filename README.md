@@ -44,6 +44,7 @@ py extract-chinese-from-pdfs.py ./slides/example.pdf --skip-all
 ```
 
 Flags: 
+- ```--output-directory [path]```: Specify the output directory for the generated CSVs. Default is the direcotry of the PDFs. 
 - ```--skip-translation```: Skip translation of extracted Chinese text to Danish.
 - ```--skip-segmentation```: Skip extraction of (sub)phrases from the Chinese text.
 - ```--skip-all```: Skip both translation and segmentation of the extracted Chinese text.
