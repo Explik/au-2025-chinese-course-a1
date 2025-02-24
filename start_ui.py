@@ -1,3 +1,4 @@
+import platform
 import streamlit as st 
 from streamlit import session_state
 import os
@@ -7,6 +8,12 @@ import asyncio
 import json
 
 upload_dir = ".\\uploads"
+
+running_platform = platform.processor()
+print(f"Running platform: {running_platform}")
+
+running_locally = len(running_platform  or "") != 0
+print(f"Running locally: {running_locally}")
 
 # (State) functions
 def save_uploaded_file(file_name: str, buffer): 
