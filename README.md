@@ -31,7 +31,6 @@ streamlit run generator_ui.py
 
 If you want to debug the UI, you can run the script debug_generator_ui.py instead.
 
-
 ## Usage (CLI)
 To extract Chinese text from a PDF, run the following command in your terminal: 
 ```bash
@@ -56,5 +55,12 @@ py generate-flashcards-from-csvs.py < path_to_csv_or_directory >
 
 Flags: 
 - ```--output-directory [path]```: Specify the output directory for the generated TXTs. Default is the directory of the CSVs.
-- ```--one-way```: Generate one-way flashcards (i.e. only from Chinese to Danish). Default is two-way flashcards (i.e. from Chinese to Danish and vice versa).
+- ```--format [format]```: Specify the format of the generated flashcards. Default is "{text}\t{translation}".
 - ```--skip-segmented```: Skip all (sub)phrase flashcards. Default is to generate flashcards for all.
+
+## Tips & Tricks
+Possible formats: 
+- ```{text}\t{translation}```: Chinese text to translation (Single-flashcard)
+- ```{text}\t{pinyin}```: Chinese text to pin yin (Single-flashcard)
+- ```{text}\t{text} ({pinyin}) - {translation}```: Chinese text to chinese text, pin yin and translation (Single-flashcard)
+- ```{text}\t{text} ({pinyin}) - {translation}\n{translation}\t{text} ({pinyin})``` : Chinese text to chinese text, pin yin and translation (First-flashcard), translation to chinese text, pin yin and translation (Second-flashcard)

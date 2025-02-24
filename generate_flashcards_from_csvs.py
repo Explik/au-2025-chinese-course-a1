@@ -2,12 +2,6 @@ import sys
 import os
 import csv
 
-first_direction_template = "{text}\t{text} ({pinyin}) - {translation}\n"
-second_direction_template = "{translation}\t{text} ({pinyin})\n"
-
-one_way_template = first_direction_template
-two_way_template = first_direction_template + second_direction_template
-
 class CsvLine: 
     def __init__(self, text, pinyin, translation, is_sub_prase):
         self.text = text
@@ -108,6 +102,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Check for optional arguments
+    # --output-directory [path]
     output_directory = os.path.dirname(file_path)
     if '--output-directory' in sys.argv:
         output_index = sys.argv.index('--output-directory') + 1
@@ -121,13 +116,29 @@ if __name__ == "__main__":
             print('Please provide a valid output directory path')
             sys.exit(1)
 
-    if '--one-way' in sys.argv:
-        print("Using one-way flashcard template")
-        FlashcardGenerator.TEMPLATE = first_direction_template
-    else: 
-        print("Using two-way flashcard template")
-        FlashcardGenerator.TEMPLATE = two_way_template
+    # --format [format_string]
+    if '--format' in sys.argv:
+        format_index = sys.argv.index('--format') + 1
+        if format_index < len(sys.argv):
+            format_string = sys.argv[format_index]
 
+            if "--" in format_string:
+                print('Please provide a valid format string')
+                sys.exit(1)
+            
+            if len(format_string) == 0:
+                print("Please provide a valid format string")
+                sys.exit(1)
+
+            FlashcardGenerator.TEMPLATE = format_string.replace("\\n", "\n").replace("\\t", "\t") + "\n"
+        else:
+            print('Please provide a valid format string')
+            sys.exit(1)
+    else: 
+        print("Using default format string")
+        FlashcardGenerator.TEMPLATE = "{text}\t{translation}\n"
+    
+    # --skip-segmented
     if '--skip-segmented' in sys.argv:
         print("Skipping segmented phrases")
         FlashcardGenerator.SKIP_SEGMENTED = True
