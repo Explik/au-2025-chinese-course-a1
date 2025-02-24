@@ -9,11 +9,10 @@ import json
 
 upload_dir = ".\\uploads"
 
-running_platform = platform.processor()
-print(f"Running platform: {running_platform}")
+environment_value = os.getenv("ENVIRONMENT", "local")
+is_local = environment_value == "local"
 
-running_locally = len(running_platform  or "") != 0
-print(f"Running locally: {running_locally}")
+print("Running in environment: ", environment_value)
 
 # (State) functions
 def save_uploaded_file(file_name: str, buffer): 
