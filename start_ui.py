@@ -213,6 +213,8 @@ txt_file_path = get_txt_path()
 #print(f"Session State: {session_state}")
 
 # Upload section 
+st.set_page_config(page_title="CH-DA Flashcard Generator")
+
 st.title("CH-DA Flashcard Generator")
 st.write("Upload a PDF or an already generated CSV file to generate flashcards.")
 
