@@ -92,6 +92,14 @@ def get_txt_content():
     with open(txt_file_path, "r", encoding="utf-8") as file:
         return file.read()
 
+def get_csv_content():
+    csv_file_path = get_csv_path()
+    if csv_file_path is None:
+        return None
+    
+    with open(csv_file_path, "r", encoding="utf-8") as file:
+        return file.read()
+
 # Callbacks 
 def handle_file_upload():
     file_upload = session_state.get("file_upload", None)
@@ -241,7 +249,7 @@ if mode == "pdf":
             else: 
                 st.download_button(
                     "Download file",
-                    csv_file_path,
+                    get_csv_content(),
                     "flashcards.csv",
                     key="download_csv_file")
 
@@ -282,7 +290,7 @@ if csv_file_path is not None:
             else: 
                 st.download_button(
                     "Download file",
-                    txt_file_path,
+                    get_txt_content(),
                     "flashcards.txt",
                     key="download_flashcard_file")
 
