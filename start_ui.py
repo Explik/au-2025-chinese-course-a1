@@ -3,10 +3,10 @@ from streamlit import session_state
 import os
 from extract_chinese_from_pdfs import ChinesePhrase, process_file_async 
 from generate_flashcards_from_csvs import FlashcardGenerator, process_file
-import pyperclip
 import asyncio
+import json
 
-upload_dir = ".\\uploaded"
+upload_dir = ".\\uploads"
 
 # (State) functions
 def save_uploaded_file(file_name: str, buffer): 
@@ -30,6 +30,19 @@ def reveal_file_in_explorer(file_path: str):
                 subprocess.call(['xdg-open', file_path])
     except Exception as e:
         st.error(f"An error occurred while trying to reveal the file: {e}")
+
+def create_copy_button(st, text, text_content):
+    # Fetch copy button template
+    html_template_file_path = os.path.join(".", "copy-button.html")
+    with open(html_template_file_path, 'r') as file:
+        html_template = file.read()
+
+    # Create copy button from template and txt content
+    html = html_template \
+        .replace("BUTTON_TEXT", text) \
+        .replace("TEXT_CONTENT", json.dumps(text_content))
+    
+    st.components.v1.html(html, height=40)
 
 def get_mode(): 
     if session_state.get("mode", None) is not None: 
@@ -123,7 +136,7 @@ def handle_pdf_convert():
         
         ChinesePhrase.SKIP_TRANSLATION = skip_translation
         ChinesePhrase.SKIP_SEGMENTATION = skip_segmentation
-        csv_file_path = asyncio.run(process_file_async(pdf_file_path))
+        csv_file_path = asyncio.run(process_file_async(pdf_file_path, os.path.join(".", "uploads-output")))
 
         session_state.csv_process = {
             "status": "completed",
@@ -170,19 +183,6 @@ def handle_csv_convert():
             "status": "failed",
             "error": str(e)
         }
-
-def handle_txt_copy(): 
-    txt_file_path = get_txt_path()
-    if txt_file_path is None:
-        st.error("No flashcards generated")
-        return
-
-    txt_content = None
-    with open(txt_file_path, "r", encoding="utf-8") as file:
-        txt_content = file.read()
-
-    pyperclip.copy(txt_content)
-    st.success("Flashcards copied to clipboard")
 
 # Setting up application state 
 mode = get_mode()
@@ -271,4 +271,4 @@ if txt_file_path is not None:
 
     st.write("#####")
     st.text_area("Generated Flashcards", txt_content, height=300)
-    st.button("Copy to Clipboard", on_click=handle_txt_copy)
+    create_copy_button(st, "Copy to Clipboard", txt_content)
