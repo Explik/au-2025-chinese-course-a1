@@ -9,6 +9,28 @@ import csv
 import sys
 import os
 
+# Ininitializing cache 
+cache_file_path = 'cache.csv'
+
+pinyin_cache = dict()
+translation_cache = dict()
+
+if os.path.exists(cache_file_path):
+    with open(cache_file_path, mode='r', encoding='utf-8-sig') as cache_file:
+        reader = csv.reader(cache_file, delimiter=';')
+        for row in reader:
+            if row:
+                text, pinyin_text, translation = row[0], row[1], row[2]
+                
+                if len(pinyin_text or '') == 0:
+                    continue
+
+                if len(pinyin_text or '') > 0:
+                    pinyin_cache[text] = pinyin_text
+
+                if len(translation or '') > 0:
+                    translation_cache[text] = translation
+
 # Simple functions 
 def extract_text_from_pdf(pdf_path):
     pdf_reader = PdfReader(pdf_path)
@@ -19,6 +41,9 @@ def filter_chinese_characters(text):
     return ' '.join(chinese_signs)
 
 def generate_pinyin(text):
+    if text in pinyin_cache:
+        return pinyin_cache[text]
+
     return pinyin.get(text, delimiter=' ')
 
 def has_wiktionary_entry(chinese_phrase):
@@ -57,6 +82,9 @@ def extract_chinese_sub_phrases(chinese_phrase):
     return valid_sub_phrases
 
 async def translateAsync(text, target_language):
+    if text in translation_cache:
+        return translation_cache[text]
+
     translator = Translator()
     translation = await translator.translate(text, dest=target_language)
     return translation.text

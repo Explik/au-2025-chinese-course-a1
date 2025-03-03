@@ -15,6 +15,8 @@ The flashcards are generated in 3-steps:
     A. Create new flashcard set
     B. Import the flashcards from the TXT file
 
+Tip, if you find any erronous pinyin or translation, you can add these to cache.csv. This will ensure that the same error is not made again.
+
 ## Setup 
 1. Install required python packages by running the following command in your terminal: 
 ```bash 
