@@ -1,0 +1,1 @@
+py ..\generate_flashcards_from_csvs.py .\output-csv\ --output-directory .\output-short-flashcards --format "{text}\t{text} ({pinyin}) - {translation}" --skip-segmented

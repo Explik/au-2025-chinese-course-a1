@@ -1,6 +1,8 @@
 # Project-specific files
-slides/
+input-pdf/
 output-csv/
+output-short-flashcards/
+output-long-flashcards/
 
 uploads/
 uploads-output/
